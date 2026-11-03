@@ -1,0 +1,26 @@
+{
+  "timeout": {
+    "type": "int",
+    "description": "请求超时（秒）",
+    "hint": "访问中央气象台接口的单次超时时间。网络较差时可调大，范围 5~120。",
+    "default": 20
+  },
+  "retries": {
+    "type": "int",
+    "description": "失败重试次数",
+    "hint": "单次请求失败后的重试次数，范围 0~5。重试采用递增退避，不建议调太大。",
+    "default": 2
+  },
+  "proxy": {
+    "type": "string",
+    "description": "HTTP 代理（可选）",
+    "hint": "访问 www.nmc.cn 不通时填写，例如 http://127.0.0.1:7890。留空表示直连。",
+    "default": ""
+  },
+  "user_agent": {
+    "type": "string",
+    "description": "User-Agent（可选）",
+    "hint": "留空使用内置的 Chrome UA。一般不需要修改。",
+    "default": ""
+  }
+}

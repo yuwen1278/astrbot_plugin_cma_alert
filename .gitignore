@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+_upload/
+_data/
+cwa_ref/
+_cma_itest_sandbox/
+_itest_sandbox/

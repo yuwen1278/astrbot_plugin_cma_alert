@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>中央气象台预警播报</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-title">
+        <h1>中央气象台预警播报</h1>
+        <span id="connection-state" class="status-pill status-neutral">加载中</span>
+      </div>
+      <div class="topbar-actions">
+        <button id="refresh-button" class="button button-secondary" type="button">刷新</button>
+        <button id="save-button" class="button button-primary" type="button">保存设置</button>
+      </div>
+    </header>
+
+    <main class="workspace" aria-live="polite">
+      <section class="status-strip" aria-label="服务状态">
+        <div class="status-item">
+          <span class="status-label">服务状态</span>
+          <strong id="service-state">--</strong>
+        </div>
+        <div class="status-item">
+          <span class="status-label">订阅会话</span>
+          <strong id="subscription-count">0</strong>
+        </div>
+        <div class="status-item">
+          <span class="status-label">启用规则</span>
+          <strong id="enabled-count">0</strong>
+        </div>
+        <div class="status-item">
+          <span class="status-label">最近检查</span>
+          <strong id="last-poll">--</strong>
+        </div>
+        <div class="status-item status-item-wide">
+          <span class="status-label">最近一次预警条数 / 错误</span>
+          <strong id="last-summary">--</strong>
+        </div>
+      </section>
+
+      <div id="page-error" class="notice notice-error" role="alert" hidden></div>
+
+      <div class="operations-grid">
+        <div class="operations-main">
+          <section class="panel" aria-labelledby="global-heading">
+            <div class="panel-heading">
+              <div>
+                <h2 id="global-heading">全局设置</h2>
+                <span id="revision-label" class="metadata-text">版本 --</span>
+              </div>
+            </div>
+            <div class="form-grid form-grid-global">
+              <label class="field field-inline">
+                <span>启用自动播报</span>
+                <input id="enabled-input" type="checkbox" role="switch" />
+              </label>
+              <label class="field">
+                <span>轮询间隔（秒）</span>
+                <input
+                  id="poll-interval-input"
+                  type="number"
+                  min="60"
+                  max="1800"
+                  step="30"
+                  inputmode="numeric"
+                />
+                <small>60 ~ 1800 秒，建议不低于 180 秒。</small>
+              </label>
+              <label class="field">
+                <span>正文长度上限（字）</span>
+                <input
+                  id="content-limit-input"
+                  type="number"
+                  min="80"
+                  max="2000"
+                  step="20"
+                  inputmode="numeric"
+                />
+                <small>预警正文与防御指南截断长度。</small>
+              </label>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="rules-heading">
+            <div class="panel-heading">
+              <div>
+                <h2 id="rules-heading">订阅规则</h2>
+                <span id="rules-summary" class="metadata-text">0 条</span>
+              </div>
+              <button id="add-rule-button" class="button button-secondary" type="button">
+                新增规则
+              </button>
+            </div>
+            <div id="rules-container" class="rules-list"></div>
+            <p id="rules-empty" class="empty-hint">
+              还没有订阅规则。可在 QQ 群或私聊里发送 <code>/cma_register 广州,深圳</code>
+              自动登记，也可以点「新增规则」手动添加。
+            </p>
+          </section>
+        </div>
+
+        <aside class="operations-aside">
+          <section class="panel" aria-labelledby="source-heading">
+            <div class="panel-heading">
+              <h2 id="source-heading">数据源</h2>
+            </div>
+            <div class="form-grid">
+              <dl id="source-detail" class="detail-list"></dl>
+              <button id="source-test-button" class="button button-secondary" type="button">
+                测试中央气象台接口
+              </button>
+              <div id="source-test-result" class="inline-result" hidden></div>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="preview-heading">
+            <div class="panel-heading">
+              <h2 id="preview-heading">内容预览</h2>
+            </div>
+            <div class="form-grid">
+              <div class="compact-row">
+                <button id="preview-alert-button" class="button button-secondary" type="button">
+                  预览预警
+                </button>
+                <button id="preview-forecast-button" class="button button-secondary" type="button">
+                  预览天气
+                </button>
+              </div>
+              <div id="preview-result" class="inline-result" hidden></div>
+            </div>
+          </section>
+        </aside>
+      </div>
+
+      <section class="panel delivery-panel" aria-labelledby="delivery-heading">
+        <div class="panel-heading">
+          <div>
+            <h2 id="delivery-heading">投递记录</h2>
+            <span id="delivery-summary" class="metadata-text">暂无记录</span>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>目标会话</th>
+                <th>类型</th>
+                <th>状态</th>
+                <th>错误</th>
+              </tr>
+            </thead>
+            <tbody id="delivery-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="confirm-dialog" class="dialog dialog-confirm">
+      <form method="dialog">
+        <h2 id="confirm-title">确认操作</h2>
+        <p id="confirm-message"></p>
+        <div class="dialog-actions">
+          <button id="confirm-cancel" class="button button-secondary" value="cancel">取消</button>
+          <button id="confirm-accept" class="button button-danger" value="confirm">确认</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" hidden></div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
