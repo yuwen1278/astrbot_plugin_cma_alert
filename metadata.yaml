@@ -2,7 +2,7 @@ name: astrbot_plugin_cma_alert
 display_name: 中央气象台预警播报
 short_desc: 把中央气象台的气象灾害预警与城市天气预报推送到群聊和私聊。
 desc: 抓取中央气象台（nmc.cn）发布的全国气象灾害预警信号与城市天气预报，按城市、类型、颜色等级、动作筛选后主动推送到 QQ 群 / 私聊等会话；内置 31 省 380 市对照表与可视化配置页。
-version: 1.0.0
+version: 1.0.1
 author: yuwen1278
 repo: https://github.com/yuwen1278/astrbot_plugin_cma_alert
 astrbot_version: ">=4.26.0b10,<5"

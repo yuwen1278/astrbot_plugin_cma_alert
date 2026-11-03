@@ -241,10 +241,10 @@ function renderSourceDetail() {
       const dd = document.createElement("dd");
       dd.textContent = value;
       dd.title = value;
-      return Object.assign(document.createElement("div"), {
-        className: "detail-row",
-        children: [dt, dd],
-      });
+      const row = document.createElement("div");
+      row.className = "detail-row";
+      row.append(dt, dd);
+      return row;
     }),
   );
 }
@@ -337,10 +337,10 @@ function buildCitySelect(subscription, index) {
     refreshEmptyHint();
   });
 
-  wrapper.append(tags, Object.assign(document.createElement("div"), {
-    className: "city-add",
-    children: [provinceSelect, citySelect, addButton],
-  }));
+  const cityAdd = document.createElement("div");
+  cityAdd.className = "city-add";
+  cityAdd.append(provinceSelect, citySelect, addButton);
+  wrapper.append(tags, cityAdd);
   wrapper.dataset.ruleIndex = String(index);
   return wrapper;
 }
